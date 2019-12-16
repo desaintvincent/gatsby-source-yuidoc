@@ -1,6 +1,6 @@
 {
   "name": "gatsby-source-yuidoc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A gatsby source plugin for Yuidoc",
   "repository": "https://github.com/desaintvincent/gatsby-source-yuidoc",
   "author": "Thomas Robert de Saint Vincent <destvincent@hotmail.fr>",
