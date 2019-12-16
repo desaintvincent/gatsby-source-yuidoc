@@ -7,7 +7,7 @@ const defaultConfig = {
     writeJSON: false,
     paths: [process.cwd()],
     exclude: ``,
-    baseUrl: `/documentation`,
+    baseUrl: ``,
     allowNoParent: true,
 }
 
@@ -53,7 +53,7 @@ exports.sourceNodes = async (api, pluginOptions) => {
 
         createDocClass({
             ..._class,
-            ...(config.baseUrl ? { urll: parent ? `${parent.url}${_class.name.toLowerCase()}/` : `${config.baseUrl}/class/${_class.name.toLowerCase()}/` } : {}),
+            ...(config.baseUrl ? { url: parent ? `${parent.url}${_class.name.toLowerCase()}/` : `${config.baseUrl}/class/${_class.name.toLowerCase()}/` } : {}),
         }, parent)
     }
 
