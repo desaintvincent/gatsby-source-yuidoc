@@ -49,7 +49,7 @@ module.exports = `
       name: String!
       originalId: String!
       static: Boolean!
-      url: String!
+      url: String
       params: [Param]
       return: Return
       throws: [Throw]

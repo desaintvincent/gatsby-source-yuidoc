@@ -1,44 +1,99 @@
 # gatsby-source-yuidoc
 ## Description
+A gatsby source plugin for Yuidoc
 
-Include a summary of what this plugin accomplishes. Is there a demo site that shows how this plugin operates? If so, include a link to the deployed demo site and/or its source code here.
+It will set Yuidoc data into graphql nodes.
+
+You can find all the annotations in the [YUIDoc Syntax Reference](http://yui.github.io/yuidoc/syntax/index.html) page
 
 ### Dependencies (optional)
+* [yuidocjs](https://www.npmjs.com/package/yuidocjs)
 
-Are there any plugins that must be installed in order to make this plugin work? If so, please include a list of those plugins and links to their pages here.
+## How to install and init
+ * `yarn add | npm install gatsby-source-yuidoc`
+ * In gatsby-config.js:
+ ```javascript
+{
+  plugins: [
+    {
+      resolve: `gatsby-source-yuidoc`,
+      options: {
+        paths: [path.resolve(__dirname, `/path`)],
+        exclude: path.resolve(__dirname, `/path/to_exclude`),
+      },
+    },
+  ],
+}
+```
 
-### Learning Resources (optional)
+## Available options and their default values 
+Options used in [YUIDoc Class](https://yui.github.io/yuidoc/api/classes/YUIDoc.html#property_OPTIONS)
+merged with plugin options:
 
-If there are other tutorials, docs, and learning resources that are necessary or helpful to someone using this plugin, please link to those here.
+| Option        | Definition                                                                   | Default value |
+|---------------|------------------------------------------------------------------------------|---------------|
+| baseUrl       | If provided, will generate an url for each node                              | ``            |
+| allowNoParent | If false, the plugin will not create nodes without parents, except DocModule | true          |
 
-## How to install
+```javascript
+{
+    quiet: false,
+    writeJSON: true,
+    outdir: path.join(process.cwd(), 'out'),
+    extension: '.js',
+    exclude: '.DS_Store,.svn,CVS,.git,build_rollup_tmp,build_tmp,node_modules',
+    norecurse: false,
+    version: '0.1.0',
+    paths: [],
+    themedir: path.join(__dirname, 'themes', 'default'),
+    syntaxtype: 'js',
+    baseUrl: `/documentation`,
+    allowNoParent: true,
+}
+```
 
-Please include installation instructions here.
+## Nodes
+This plugin will generate nodes described in [types.js](./types.js):
 
-## Available options (if any)
+* DocModule
+* DocClass
+* DocMethod
 
-## When do I use this plugin?
+#### Relations
+| Parent    | Children  |
+|-----------|-----------|
+| /         | DocModule |
+| DocModule | DocClass  |
+| DocClass  | DocMethod |
 
-Include stories about when this plugin is helpful and/or necessary.
+#### Url
+Each node has a generated url if the config `baseUrl` is provided
 
-## Examples of usage
+| Node      | Url                                                                  |
+|-----------|----------------------------------------------------------------------|
+| DocModule | \`${baseUrl}/${DocModule.name}/\`                                    |
+| DocClass  | \`${baseUrl}/${DocModule.name}/${DocClass.name}/\`                   |
+| DocMethod | \`${baseUrl}/${DocModule.name}/${DocClass.name}/#${DocMethod.name}\` |
 
-This usually shows a code example showing how to include this plugin in a site's `config.js` file.
-
-    code example
-
-//See this [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#code) on how to format code examples.
-
-This section could also include before-and-after examples of data when the plugin is enabled, if applicable.
-
-## How to query for data (source plugins only)
-
-If this is a source plugin README, source plugins ought to allow people to query for data within their Gatsby site. Please include code examples to show how to query for data using your source plugin.
+## How to query for data
+```graphql
+query MyDoc {
+  allDocModule {
+    nodes {
+      name
+      childrenDocClass {
+        name
+        childrenDocMethod {
+          name
+        }
+      }
+    }
+  }
+}
+```
 
 ## How to run tests
-
-## How to develop locally
+lint: yarn lint
 
 ## How to contribute
-
-If you have unanswered questions, would like help with enhancing or debugging the plugin, it is nice to include instructions for people who want to contribute to your plugin.
+If you'd like to contribute any changes simply fork the project on Github and send a pull request.

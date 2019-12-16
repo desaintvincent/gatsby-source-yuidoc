@@ -2,21 +2,19 @@ const yuidoc = require(`yuidocjs`)
 const { createEntityNode, createAllNodes, findNode } = require(`./nodes.helper`)
 const types = require(`./types`)
 
-function defaultConfig() {
-    return {
-        quiet: true,
-        writeJSON: false,
-        paths: [process.cwd()],
-        exclude: ``,
-        baseUrl: `/documentation`,
-        allowNoParent: true
-    }
+const defaultConfig = {
+    quiet: true,
+    writeJSON: false,
+    paths: [process.cwd()],
+    exclude: ``,
+    baseUrl: `/documentation`,
+    allowNoParent: true,
 }
 
 exports.sourceNodes = async (api, pluginOptions) => {
     const { reporter, actions: { createTypes } } = api
     const config = {
-        ...defaultConfig(),
+        ...defaultConfig,
         ...pluginOptions,
     }
 
@@ -40,12 +38,12 @@ exports.sourceNodes = async (api, pluginOptions) => {
         createDocModule({
             ..._module,
             shortName,
-            url: `${config.baseUrl}/${shortName.toLowerCase()}/`
+            ...(config.baseUrl ? { url: `${config.baseUrl}/${shortName.toLowerCase()}/` } : {}),
         })
     }
 
     for (const _class of Object.values(classes)) {
-        const parent = findNode(`DocModule`, (node => node.name === _class.module))
+        const parent = findNode(`DocModule`, node => node.name === _class.module)
         if (!config.allowNoParent && !parent) {
             reporter.warn(
                 `Class ${_class.name} was ignored because parent module (${_class.module}) was not found`,
@@ -55,24 +53,28 @@ exports.sourceNodes = async (api, pluginOptions) => {
 
         createDocClass({
             ..._class,
-            url: parent ? `${parent.url}${_class.name.toLowerCase()}/` : `${config.baseUrl}/class/${_class.name.toLowerCase()}/`
+            ...(config.baseUrl ? { urll: parent ? `${parent.url}${_class.name.toLowerCase()}/` : `${config.baseUrl}/class/${_class.name.toLowerCase()}/` } : {}),
         }, parent)
     }
 
     for (const _method of Object.values(classitems)) {
-        const parent = findNode(`DocClass`, (node => node.name === _method.class))
+        const parent = findNode(`DocClass`, node => node.name === _method.class)
         if (!config.allowNoParent && !parent) {
             reporter.warn(
                 `Method ${_method.name} was ignored because parent class (${_method.class}) was not found`,
             )
             continue
         }
-        const name = (_method.is_constructor ? `constructor` : _method.name).toLowerCase()
+        const name = _method.is_constructor ? `constructor` : _method.name
+        const lowerName = name.toLowerCase()
         createDocMethod({
             ..._method,
+            name,
             is_constructor: !!_method.is_constructor,
             static: !!_method.static,
-            url: parent ? `${parent.url}#${name}` : `${config.baseUrl}/method/${name}/`
+            params: _method.params || [],
+            return: _method.return || {},
+            ...(config.baseUrl ? { url: parent ? `${parent.url}#${lowerName}` : `${config.baseUrl}/method/${lowerName}/` } : {}),
         }, parent)
     }
 
