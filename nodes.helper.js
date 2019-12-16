@@ -2,7 +2,7 @@ const allNodesToCreate = []
 
 function createEntityNode (
   type,
-  { createNodeId, createContentDigest, createNode },
+  { createNodeId, createContentDigest },
 ) {
   return (item, parent) => {
     const node = {
@@ -38,7 +38,7 @@ function findNode (type, callback) {
   return allTypeNodes.find(callback)
 }
 
-function createAllNodes ({actions: {createNode}}) {
+function createAllNodes ({ actions: { createNode } }) {
   return Promise.all(
     allNodesToCreate.map(node => {
       return createNode(node)
