@@ -31,6 +31,7 @@ exports.sourceNodes = async (api, pluginOptions) => {
     const createDocModule = createEntityNode(`DocModule`, api)
     const createDocClass = createEntityNode(`DocClass`, api)
     const createDocMethod = createEntityNode(`DocMethod`, api)
+    const createDocProperty = createEntityNode(`DocProperty`, api)
     createTypes(types)
 
     for (const _module of Object.values(modules)) {
@@ -67,15 +68,25 @@ exports.sourceNodes = async (api, pluginOptions) => {
         }
         const name = _method.is_constructor ? `constructor` : _method.name
         const lowerName = name.toLowerCase()
-        createDocMethod({
-            ..._method,
-            name,
-            is_constructor: !!_method.is_constructor,
-            static: !!_method.static,
-            params: _method.params || [],
-            return: _method.return || {},
-            ...(config.baseUrl ? { url: parent ? `${parent.url}#${lowerName}` : `${config.baseUrl}/method/${lowerName}/` } : {}),
-        }, parent)
+        if (_method.itemtype === `method`) {
+            createDocMethod({
+                id: `${(parent && parent.id) || `none`}-${name}`,
+                ..._method,
+                name,
+                is_constructor: !!_method.is_constructor,
+                static: !!_method.static,
+                params: _method.params || [],
+                return: _method.return || {},
+                ...(config.baseUrl ? { url: parent ? `${parent.url}#${lowerName}` : `${config.baseUrl}/method/${lowerName}/` } : {}),
+            }, parent)
+        } else if (_method.itemtype === `property`) {
+            createDocProperty({
+                id: `${(parent && parent.id) || `none`}-${name}`,
+                ..._method,
+                name,
+                ...(config.baseUrl ? { url: parent ? `${parent.url}#${lowerName}` : `${config.baseUrl}/method/${lowerName}/` } : {}),
+            }, parent)
+        }
     }
 
     return createAllNodes(api)
