@@ -50,8 +50,30 @@ module.exports = `
       originalId: String!
       static: Boolean!
       url: String
-      params: [Param]
+      params: [Param]!
       return: Return
+      broadcast: String
       throws: [Throw]
+    }
+    type DocProperty implements Node {
+      description: String
+      file: String!
+      itemtype: String!
+      line: String!
+      module: String
+      name: String!
+      originalId: String!
+      url: String
+    }
+    type DocEvent implements Node {
+      description: String
+      file: String!
+      itemtype: String!
+      line: String!
+      params: [Param]!
+      module: String
+      name: String!
+      originalId: String!
+      url: String
     }
 `
